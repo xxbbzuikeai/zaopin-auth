@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>window.DP1_API_BASE='https://inappropriate-swan-d8c59977a1019-1514742363.ap-shanghai.app.tcloudbase.com';</script>
+<title>在招厂区位置地图</title>
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<header>
+  <div class="ttl">在招厂区位置地图<span class="sub">在线底图 · 在线地址检索</span></div>
+  <div class="meta" id="meta"></div>
+</header>
+<div class="wrap">
+  <aside id="side">
+    <div class="block">
+      <div class="lbl">① 输入地址 / 地名 / 厂名，定位起点</div>
+      <div class="srow">
+        <input id="q" placeholder="如：瑞安莘塍街道金凤路 / 台州三门沿海工业城 / 温岭箬横镇" autocomplete="off">
+        <button id="btnGo">定位</button>
+      </div>
+      <div class="swrow">
+        <span class="badge" id="netBadge">在线检索：就绪</span>
+        <span class="badge btn" id="baseBadge">底图：在线</span>
+        <span class="badge btn" id="updBadge">刷新数据</span>
+      </div>
+      <div id="sug" class="sug"></div>
+      <div id="originInfo" class="origin"></div>
+      <div class="tip">地址检索优先调用高德 Web 服务（门牌/POI 级，GCJ-02 与底图同源）；高德不可用时降级 Photon 在线解析，并叠加本地地名库命中；也可直接点击地图取点，并用「存为常用点」固定下来。<br>检索源徽标可点击设置/更换高德 Key。</div>
+    </div>
+    <div class="block">
+      <div class="lbl">② 批次筛选</div>
+      <div class="datebar">
+        <span class="dlab">日期</span>
+        <select id="dateSel"><option value="">全部日期</option></select>
+      </div>
+      <div class="filters" id="filters"></div>
+    </div>
+    <div class="block grow">
+      <div class="lbl">③ 企业列表<span class="cnt" id="cnt"></span><span class="mini" id="pickAll">全选</span><span class="mini" id="pickNone">全不选</span></div>
+      <div class="jbar">
+        <input id="qj" placeholder="搜索厂名 / 岗位 / 薪资 / 备注，再逐个勾选参与筛选" autocomplete="off">
+        <span class="badge" id="pickCnt">已选 0/0</span>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+  </aside>
+  <div id="map"></div>
+</div>
+<button id="memoTab" type="button" title="人员备忘录：记录谁要进哪个厂">人员<span class="n" id="memoTabN">0</span></button>
+<aside id="memo" aria-label="人员备忘录">
+  <div class="memo-h"><b>人员备忘录</b><span class="st" id="memoSt"></span><button id="memoClose" type="button" title="收起（Esc）">×</button></div>
+  <div class="memo-form">
+    <input id="memoName" placeholder="姓名" autocomplete="off">
+    <input id="memoTel" placeholder="电话" autocomplete="off">
+    <input id="memoFac" class="fac" list="memoFacDL" placeholder="需要的厂（输入可筛选，也可手填）" autocomplete="off">
+    <datalist id="memoFacDL"></datalist>
+    <button id="memoAdd" type="button">添加人员</button>
+  </div>
+  <div class="memo-list" id="memoList"></div>
+</aside>
+<div id="toast"></div>
+<script src="js/auth.js"></script>
+<script src="vendor/leaflet.js"></script>
+</body>
+</html>
