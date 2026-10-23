@@ -10,7 +10,10 @@
     });
   }
   var API_BASE = (typeof window !== 'undefined' && window.DP1_API_BASE) || '';
-  function token() { try { return localStorage.getItem('dp1_api_token') || ''; } catch (e) { return ''; } }
+  /* 后台专用令牌：与会话网站分开存（sessionStorage），关掉浏览器就失效 */
+  var PANEL_KEY = 'dp1_panel_token';
+  function token() { try { return sessionStorage.getItem(PANEL_KEY) || ''; } catch (e) { return ''; } }
+  function setToken(v) { try { v ? sessionStorage.setItem(PANEL_KEY, v) : sessionStorage.removeItem(PANEL_KEY); } catch (e) {} }
   function api(url, body) {
     var opt = { cache: 'no-store', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() } };
     if (body !== undefined) { opt.method = 'POST'; opt.body = JSON.stringify(body); }
@@ -35,7 +38,8 @@
       api('/api/login', { username: $('lu').value.trim(), password: $('lp').value }).then(function (j) {
         $('lbtn').disabled = false;
         if (!j.ok) { $('loginMsg').textContent = j.error || '登录失败'; return; }
-        if (j.token) { try { localStorage.setItem('dp1_api_token', j.token); } catch (e) {} }
+        if (!j.user || j.user.role !== 'admin') { setToken(''); $('loginMsg').textContent = '这个账号不是管理员，不能进后台'; return; }
+        setToken(j.token || '');
         location.reload();
       });
     };
@@ -143,14 +147,17 @@
 
     $('logoutBtn').onclick = function (e) {
       e.preventDefault();
-      api('/api/logout', {}).then(function () { try { localStorage.removeItem('dp1_api_token'); } catch (e) {} location.href = '/'; });
+      api('/api/logout', {}).then(function () { setToken(''); location.href = '/'; });
     };
   }
 
   function init() {
+    /* 后台每次进来都要单独登录，不复用网站登录态 */
+    if (!token()) { showLogin('请先用管理员账号登录'); return; }
     api('/api/me').then(function (j) {
       if (!j.ok || !j.user || j.user.role !== 'admin') {
-        showLogin(!j.ok ? '' : '当前账号不是管理员，请用管理员账号登录');
+        setToken('');
+        showLogin(!j.ok ? '后台登录已失效，请重新登录' : '当前账号不是管理员，请用管理员账号登录');
         return;
       }
       isAdmin = true;
